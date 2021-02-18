@@ -1,6 +1,7 @@
 
 import subprocess
 import optparse
+import re
 
 def change_mode(interface, mode):
     subprocess.call(["ifconfig", interface, "down"])
@@ -20,10 +21,17 @@ def get_arguments():
     return options
 
 
-def get_mode():
-    print("")
+def get_mode(interface):
+    iwconfig_result = subprocess.check_output(["iwconfig", interface])
+    mode_search_result = re.search(r"Mode:\D\D\D\D\D\D\D", iwconfig_result.decode("utf-8"))
+    if mode_search_result:
+        return mode_search_result.group(0)
+
 
 options = get_arguments()
+current_mode = get_mode(options.interface)
 change_mode(options.interface, options.mode)
-
+print(current_mode)
+current_mode=get_mode(options.interface)
+print(current_mode)
 
